@@ -1,0 +1,1 @@
+gnome-terminal -x sh -c "perl main_unstable.pl; sh"

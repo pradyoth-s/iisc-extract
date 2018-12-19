@@ -1,6 +1,23 @@
+my $path = "/home/hynd/Desktop/testing/ERROR";
+my $col_name_1 = "time";
+my $col_name_2 = "d OuterVoltage";
+my $col_name_3 = "d TotalCurrent";
+my $t1 = 60E-09;
+my $t2 = 80E-09;
+
+
 use strict;
 #From here, all required files are searched for and then stored in an array in an ascending order numerically
 my @file_array = ();
+my $fh;
+my $row;
+my $pwd = system("pwd > pwd");
+open(my $fh, "pwd")
+or die "Could not open file 'pwd'!";
+while($row = <$fh>)
+{
+	$pwd = $row;
+}
 my $file;
 my $i = 0;
 my $j = 0;
@@ -10,16 +27,11 @@ my $size_datatypes = 0;
 my @extract_data_raw = ();
 my @extract_data_matrix = ();
 my $datapoints_size = 0;
-my $prefix = "I";
+my $prefix = "C";
 my $file_out = "$prefix".".csv";
 my @avg1 = ();
 my @avg2 = ();
 my @avg3 = ();
-my $col_name_1 = "d InnerVoltage";
-my $col_name_2 = "d TotalCurrent";
-my $col_name_3 = "Tmax";
-my $t1 = 0;
-my $t2 = 0;
 my $file_num = 0;
 my $col1;
 my $col2;
@@ -28,10 +40,11 @@ my @fp = ();#File prefix
 my @fs = ();#File suffix
 my @ui = ();#Underscore index
 my $uc;#Underscore count
-system("ls | grep $prefix > filenames.txt");
-open(my $fh, "filenames.txt")
+system("cd $path; ls | grep $prefix > filenames.txt");
+$path = $path;
+open(my $fh, "$path/filenames.txt")
 or die "Could not open file 'filenames.txt' $!";
-while (my $row = <$fh>) 
+while ($row = <$fh>) 
 {
 chomp $row;
 $uc=0;
@@ -44,9 +57,9 @@ for($j=0;$j<$length;$j++)
 		$uc++;
 	}
 }
-$fp($i) = substr $row, 0, $ui[0];
-$fs($i) = substr $row, $ui[1]+1, $length - $ui[1];
-$row = substr $row, $ui[0], $ui[1]-$ui[0];
+$fp[$i] = substr $row, 0, $ui[0]+1;
+$fs[$i] = substr $row, $ui[1], $length - $ui[1] + 1;
+$row = substr $row, $ui[0]+1, $ui[1]-$ui[0]-1;
 $file_array[$i]=$row;
 $i++;
 }
@@ -114,7 +127,7 @@ foreach $file (@file_array)
 }
 #Finding average for all input files complete
 print "Found average for all files\n";
-system("rm filenames.txt");
+system("rm $path/filenames.txt");
 
 print "Preparing to print data to output file $file_out...\n";
 open(my $fh, '>', $file_out) or die "Could not open file '$file_out'";
@@ -128,12 +141,14 @@ for($i=0;$i<$file_num;$i++)
 close $fh;
 print "Writing to output file complete...\n";
 my $filename;
+
+system("cd $pwd");
 sub find_datatype
 {
 $filename;
 ($filename) = @_;
 # open the file
-open MYFILE, "$filename" or die "could not open $filename";
+open MYFILE, "$path/$filename" or die "could not open $filename";
 my $string="";
 my $true=0;
 my $i=0;
@@ -201,7 +216,7 @@ sub extract_data_raw
 my $filename;
 ($filename) = @_;
 # open the file
-open MYFILE, "$filename" or die "could not open $filename";
+open MYFILE, "$path/$filename" or die "could not open $filename";
 my $string="";
 my $true=0;
 my $curly_count=0;
